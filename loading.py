@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 def load_public_body_info():
-    data_pbodies = np.load('./data/public_bodies.npy')
+    pbodies = np.load('./data/public_bodies.npy')
     
     pbody_names = {}
     pbody_classes = {}
@@ -18,21 +18,20 @@ def load_public_body_info():
     
     # dictionaries 'translate' from uri of public body or jurisdiction to name,
     # class or rank
-    for patch in data_pbodies:
-        for pbody in patch:
-            if not pbody['jurisdiction']['resource_uri'] in pbody_juris:
-                pbody_juris[pbody['jurisdiction']['resource_uri']] =\
-                                                      pbody['jurisdiction']['name']
-                
-            if not pbody['jurisdiction']['resource_uri'] in pbody_juris_rank:
-                pbody_juris_rank[pbody['jurisdiction']['resource_uri']] = \
-                                                      pbody['jurisdiction']['rank']
-    
-            if not pbody['resource_uri'] in pbody_names:
-                pbody_names[pbody['resource_uri']] = pbody['name']            
-    
-            if not pbody['resource_uri'] in pbody_classes:
-                pbody_classes[pbody['resource_uri']] = pbody['classification']
+    for pbody in pbodies:
+        if not pbody['jurisdiction']['resource_uri'] in pbody_juris:
+            pbody_juris[pbody['jurisdiction']['resource_uri']] =\
+                                                  pbody['jurisdiction']['name']
+            
+        if not pbody['jurisdiction']['resource_uri'] in pbody_juris_rank:
+            pbody_juris_rank[pbody['jurisdiction']['resource_uri']] = \
+                                                  pbody['jurisdiction']['rank']
+
+        if not pbody['resource_uri'] in pbody_names:
+            pbody_names[pbody['resource_uri']] = pbody['name']            
+
+        if not pbody['resource_uri'] in pbody_classes:
+            pbody_classes[pbody['resource_uri']] = pbody['classification']
                 
     return pbody_names, pbody_classes, pbody_juris, pbody_juris_rank
     
@@ -48,7 +47,7 @@ def load_requests():
     #%% create dataframe (without messages, they are treated separately)
     keys = list(requests[0].keys())
     keys.remove('messages')
-    dataframe = pd.DataFrame(list(requests),columns = keys, ignore_index=True)
+    dataframe = pd.DataFrame(list(requests),columns = keys)
     
     #%% add columns juris_rank and pbody_class
     dataframe['juris_rank'] = dataframe['jurisdiction'].map(pbody_juris_rank)
@@ -65,8 +64,9 @@ def load_requests():
     dataframe.ix[dataframe['status']=='asleep','completed_as'] = 'asleep'
     dataframe['completed_as'] = dataframe['completed_as'].astype('category')
     
-    outcome_order = ['successful','partially_successful', 'refused',
-                     'not_held', 'asleep', 'user_withdrew', 'user_withdrew_costs','']
+    outcome_order = ['successful','partially_successful', 'refused','not_held',\
+                     'asleep', 'user_withdrew','user_withdrew_costs','']
+                     
     outcomes_german = ['Erfolgreich','Teilweise erfolgreich','Abgelehnt',
                        'Info nicht vorhanden', 'Eingeschlafen',
                        'Zurückgezogen', 'Zurückgezogen wegen Kosten','']
@@ -81,33 +81,25 @@ def load_messages():
     (pbody_names, pbody_classes, pbody_juris, pbody_juris_rank) = pbody_info
     
     # load raw data    
-    datasets = np.load('./data/request_data_until_10083.npy')
+    requests = np.load('./data/request_data.npy')
     
-    message_example = datasets[0]['objects'][0]['messages'][0]
+    message_example = requests[0]['messages'][0]
     keys = list(message_example.keys())
     keys.remove('content')
     
-    for i,data_decoded in enumerate(datasets):
-        # get messages of requests and count how many messages per request so that
-        # you can add the request id for each message
-        message_list = []
-        [message_list.extend(request['messages']) for request in data_decoded['objects']]
-        messages_per_request = [len(request['messages']) for request in\
-                                data_decoded['objects']]
-        
-        # load id's of requests
-        rlist = data_decoded['objects']
-        df_request_ids = pd.DataFrame(rlist,columns =  ['id'])
-        
-        # load messages into dataframe and add column with request id's
-        if i == 0:
-            dataframe = pd.DataFrame(message_list,columns = keys)
-            request_ids = df_request_ids['id'].repeat(messages_per_request)
-            dataframe['request_id'] = request_ids.values
-        else:
-            tempDf = pd.DataFrame(message_list,columns = keys)
-            request_ids = df_request_ids['id'].repeat(messages_per_request)
-            tempDf['request_id'] = request_ids.values
-            dataframe = dataframe.append(tempDf, ignore_index = True)
+    # get messages of requests and count how many messages per request so that
+    # you can add the request id for each message
+    message_list = []
+    [message_list.extend(request['messages']) for request in requests]
+    
+    messages_per_request = [len(request['messages']) for request in requests]
+    
+    # load id's of requests
+    df_request_ids = pd.DataFrame(requests,columns =  ['id'])
+    
+    # load messages into dataframe and add column with request id's
+    dataframe = pd.DataFrame(message_list,columns = keys)
+    request_ids = df_request_ids['id'].repeat(messages_per_request)
+    dataframe['request_id'] = request_ids.values
             
     return dataframe

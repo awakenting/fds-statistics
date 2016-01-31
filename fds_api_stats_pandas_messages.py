@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import pandas as pd
-from pandas import ExcelWriter
+
 from fds_api_pandas_functions import *
 import loading
 
