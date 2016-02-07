@@ -9,12 +9,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
+import os
 
 plt.style.use('ggplot')
 mpl.rcParams['font.size'] = 16
 mpl.rcParams['axes.facecolor'] = 'white'
 
-files_path = '/home/andrej/Dokumente/OpenKnowledge/FragDenStaat/'
+default_colors = mpl.rcParams['axes.color_cycle']
+mpl.rcParams['axes.color_cycle'] = [default_colors[1],default_colors[0],default_colors[2]]
+
+files_path = './figures/'
 
 #%% ifg data from bmi website and fragdenstaat.de admin page
 
@@ -27,11 +31,13 @@ fds = np.array([[0,0,0,0,0,352,2405,2416,3049,4017]])
 fds_nurBund = np.array([[0,0,0,0,0,349,2253,1793,1627,2515]])
 whout_bmf = (total-bmf)-fds_nurBund
 
-data = np.concatenate((bmf,fds_nurBund,whout_bmf),axis=0)
+fds_in_percent = (fds_nurBund/total)*100
+
+data = np.concatenate((fds_nurBund,bmf,whout_bmf),axis=0)
 
 #%% plot
 
-df = pd.DataFrame(data.T,columns=['BM Finanzen','FragDenStaat','Gesamt ohne BMF und FdS'],
+df = pd.DataFrame(data.T,columns=['FragDenStaat','BM Finanzen','Gesamt ohne BMF und FdS'],
                   index = years)
 ax = df[0:-1].plot(kind='area',figsize=(16,12))
 ax.xaxis.set_tick_params(top='off')
@@ -50,7 +56,14 @@ ax.annotate("Start von FragDenStaat",
 plt.xlabel('Jahr')
 plt.ylabel('Anzahl von Anfragen')
 plt.ylim(0,np.max(data.sum(axis=0)))
-plt.savefig(files_path+'ifg_gesamtzahlen.png',dpi=180)
+
+#%% save figure
+
+if os.path.isdir(files_path):
+    plt.savefig(files_path+'ifg_gesamtzahlen.png',dpi=150)
+else:
+    os.mkdir(files_path)
+    plt.savefig(files_path+'ifg_gesamtzahlen.png',dpi=150)
 plt.close()
 
 
