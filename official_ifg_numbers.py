@@ -14,9 +14,10 @@ import os
 plt.style.use('ggplot')
 mpl.rcParams['font.size'] = 16
 mpl.rcParams['axes.facecolor'] = 'white'
+#mpl.rcParams['axes.grid'] = True
 
 default_colors = mpl.rcParams['axes.color_cycle']
-mpl.rcParams['axes.color_cycle'] = [default_colors[1],default_colors[0],default_colors[2]]
+mpl.rcParams['axes.color_cycle'] = [default_colors[1],default_colors[3],default_colors[0]]
 
 files_path = './figures/'
 
@@ -33,16 +34,15 @@ whout_bmf = (total-bmf)-fds_nurBund
 
 fds_in_percent = (fds_nurBund/total)*100
 
-data = np.concatenate((fds_nurBund,bmf,whout_bmf),axis=0)
+data = np.concatenate((fds_nurBund,whout_bmf,bmf),axis=0)
 
 #%% plot
 
-df = pd.DataFrame(data.T,columns=['FragDenStaat','BM Finanzen','Gesamt ohne BMF und FdS'],
+df = pd.DataFrame(data.T,columns=['FragDenStaat','Gesamt ohne BMF und FdS','BM Finanzen'],
                   index = years)
-ax = df[0:-1].plot(kind='area',figsize=(16,12))
+ax = df[0:-1].plot(kind='area',figsize=(16,12),alpha=0.9)
 ax.xaxis.set_tick_params(top='off')
 ax.yaxis.set_tick_params(right='off')
-
 ax.annotate("Start von FragDenStaat",
             xy=(4.5,2500), xycoords='data',
             size=24,
@@ -53,17 +53,24 @@ ax.annotate("Start von FragDenStaat",
                             fc="k",ec="k",
                             connectionstyle="arc3,rad=0.2")
             )
+ax.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-')
 plt.xlabel('Jahr')
 plt.ylabel('Anzahl von Anfragen')
-plt.ylim(0,np.max(data.sum(axis=0)))
+
+ax.legend_.set_bbox_to_anchor([1.01,1.0])
+lgd = ax.get_legend()
+#plt.ylim(0,np.max(data.sum(axis=0)))
+plt.ylim(0,10000)
 
 #%% save figure
 
 if os.path.isdir(files_path):
-    plt.savefig(files_path+'ifg_gesamtzahlen.png',dpi=150)
+    plt.savefig(files_path+'ifg_gesamtzahlen.png',bbox_extra_artists=[lgd],
+                bbox_inches='tight',dpi=150)
 else:
     os.mkdir(files_path)
-    plt.savefig(files_path+'ifg_gesamtzahlen.png',dpi=150)
+    plt.savefig(files_path+'ifg_gesamtzahlen.png',bbox_extra_artists=[lgd],
+                bbox_inches='tight',dpi=150)
 plt.close()
 
 
