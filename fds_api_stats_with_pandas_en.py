@@ -12,7 +12,7 @@ from cycler import cycler
 import numpy as np
 import pandas as pd
 from pandas import ExcelWriter
-from fds_api_pandas_functions import *
+from fds_api_pandas_functions_en import *
 import loading
 
 plt.style.use('ggplot')
@@ -20,7 +20,7 @@ plt.style.use('ggplot')
 #                                    '#777777', '#348ABD', '#FBC15E', '#E27533']
 mpl.rcParams['axes.prop_cycle'] = cycler('color',['#5DBA42', '#42BAB2', '#E24A33',
                                     '#777777', '#348ABD', '#FBC15E', '#E27533'])
-mpl.rcParams['font.size'] = 20
+mpl.rcParams['font.size'] = 24
 mpl.rcParams['axes.facecolor'] = 'white'
 
 
@@ -69,8 +69,8 @@ df_chancellor_nonuniq = dataframe[is_complete & is_chancellor]
 #%% put dataframes and according titles in lists
 
 df_all_list = [df_uniq, df_nonuniq]
-df_all_titles = ['Alle Anfragen (ohne Massenanfragen)',
-                 'Alle Anfragen (mit Massenanfragen)']
+df_all_titles = ['All requests',
+                 'All requests (with mass requests)']
                                            
 df_juris_list = [df_uniq_highrank, df_nonuniq_highrank, df_sames_highrank]
 juris_df_titles = ['Bund und Bundesländer',\
@@ -204,7 +204,7 @@ cols = df_outcomes.columns.tolist()
 last = [cols[-1]]
 last.extend(cols[0:-1])
 plot_outcomes(df_outcomes[last], title = '', 
-              filename = 'alle_anfragen_unique',orient='vertical',
+              filename = 'all_requests_unique',orient='vertical',
               text_offset=1.05, include_descriptions=True, save=True)
 
 

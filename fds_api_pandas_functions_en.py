@@ -59,9 +59,9 @@ def plot_outcomes(outcome_df, title, filename, orient='horizontal',
         barh.xaxis.set_ticklabels(np.arange(0,101,10))
         
         lgd = plt.legend(loc='lower left', bbox_to_anchor=(0.0,-0.2,1.0,0.1),ncol=3,
-                         mode='expand', borderaxespad=0., fontsize=18)
+                         mode='expand', borderaxespad=0.)
         plt.xlim((0,100))
-        plt.xlabel('Anteil an abgeschlossenen Anfragen in Prozent')
+        plt.xlabel('Percentage of completed requests')
         barh.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-')
         title_artist = plt.title(title)
         
@@ -69,11 +69,11 @@ def plot_outcomes(outcome_df, title, filename, orient='horizontal',
             barh.text(105, i,
                         '%d' % int(outcome_df.ix[:,0].values[i]),
                         ha='center', va='center')
-        texts = barh.text(105, len(outcome_df)*text_offset,'Öffentliche Anfragen\nüber FragDenStaat\nvon 2011 bis 2016',
+        texts = barh.text(105, len(outcome_df)*text_offset,'Public requests\nvia FragDenStaat\nfrom 2011 to 2016',
                   ha='center',va='bottom')
                   
     elif orient == 'vertical':
-        barv = outcome_df.ix[:,1:].plot(kind='bar',stacked=True, rot=0,figsize=(18,14))
+        barv = outcome_df.ix[:,1:].plot(kind='bar',stacked=True, rot=0,figsize=(32,24))
         barv.xaxis.set_tick_params(top='off')
         barv.yaxis.set_tick_params(right='off')
         barv.yaxis.set_ticks(np.arange(0,101,10))
@@ -84,12 +84,12 @@ def plot_outcomes(outcome_df, title, filename, orient='horizontal',
                              mode='expand', borderaxespad=0., fontsize=18)
         else:
             lgd = plt.legend(loc='lower left', bbox_to_anchor=(0.0,-0.2,1.0,0.1),ncol=3,
-                 mode='expand', borderaxespad=0., fontsize=18)
+                 mode='expand', borderaxespad=0., fontsize=32)
         
         plt.ylim((0,100))
-        plt.ylabel('Anteil an abgeschlossenen Anfragen in Prozent')
-        barv.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-')
-        font = {'size':24}
+        plt.ylabel('Percentage of completed requests')
+        barv.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-',lw=2)
+        font = {'size':32}
         title_artist = barv.text((len(outcome_df)-1)/2, 110, title, ha='center',
                                  va='center', fontdict = font)
         
@@ -98,16 +98,16 @@ def plot_outcomes(outcome_df, title, filename, orient='horizontal',
                 barv.text(i, 105,
                             '%d' % int(outcome_df.ix[:,0].values[i]),
                             ha='center', va='center')
-            texts = barv.text(len(outcome_df)*text_offset, 105, 'Öffentliche Anfragen\nüber FragDenStaat\nvon 2011 bis 2016',
+            texts = barv.text(len(outcome_df)*text_offset, 105, 'Public requests\nvia FragDenStaat\nfrom 2011 to 2016',
                       ha='center',va='center')
     
     if save:
         if include_descriptions:
             plt.savefig(files_path+filename+'_' + orient + '.png',
-                        bbox_extra_artists=[title_artist,lgd,texts], bbox_inches='tight',dpi=120)
+                        bbox_extra_artists=[title_artist,lgd,texts], bbox_inches='tight')
         else:
             plt.savefig(files_path+filename+'_' + orient + '.png',
-                        bbox_extra_artists=[title_artist,lgd], bbox_inches='tight',dpi=120)
+                        bbox_extra_artists=[title_artist,lgd], bbox_inches='tight')
         plt.close()
 
 #%% 

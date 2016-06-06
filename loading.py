@@ -37,7 +37,7 @@ def load_public_body_info():
     
 
 
-def load_requests():
+def load_requests(translate_to_german=True):
     pbody_info = load_public_body_info()
     (pbody_names, pbody_classes, pbody_juris, pbody_juris_rank) = pbody_info
     
@@ -62,17 +62,22 @@ def load_requests():
     
     dataframe['completed_as'] = dataframe['resolution']
     dataframe.ix[dataframe['status']=='asleep','completed_as'] = 'asleep'
+    is_withdrawn = dataframe['completed_as'] == 'user_withdrew'
+    is_withdrawn_cost = dataframe['completed_as'] == 'user_withdrew_costs'
+    dataframe.ix[is_withdrawn | is_withdrawn_cost,'completed_as'] = 'withdrawn'
     dataframe['completed_as'] = dataframe['completed_as'].astype('category')
     
     outcome_order = ['successful','partially_successful', 'refused','not_held',\
-                     'asleep', 'user_withdrew','user_withdrew_costs','']
+                     'asleep', 'withdrawn','']
                      
     outcomes_german = ['Erfolgreich','Teilweise erfolgreich','Abgelehnt',
                        'Info nicht vorhanden', 'Eingeschlafen',
-                       'Zurückgezogen', 'Zurückgezogen wegen Kosten','']
+                       'Zurückgezogen','']
     dataframe['completed_as'].cat.reorder_categories(outcome_order,ordered=True,
                                                      inplace=True)
-    dataframe['completed_as'].cat.rename_categories(outcomes_german,inplace=True)
+                                                     
+    if translate_to_german:
+        dataframe['completed_as'].cat.rename_categories(outcomes_german,inplace=True)
     
     return dataframe
     
@@ -95,11 +100,12 @@ def load_messages():
     messages_per_request = [len(request['messages']) for request in requests]
     
     # load id's of requests
-    df_request_ids = pd.DataFrame(requests,columns =  ['id'])
+    df_request_ids = pd.DataFrame(list(requests),columns =  ['id'])
     
     # load messages into dataframe and add column with request id's
     dataframe = pd.DataFrame(message_list,columns = keys)
     request_ids = df_request_ids['id'].repeat(messages_per_request)
     dataframe['request_id'] = request_ids.values
+    dataframe['public_body'] = dataframe['recipient_public_body'].map(pbody_names)
             
     return dataframe

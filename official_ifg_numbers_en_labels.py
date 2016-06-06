@@ -13,7 +13,7 @@ import pandas as pd
 import os
 
 plt.style.use('ggplot')
-mpl.rcParams['font.size'] = 16
+mpl.rcParams['font.size'] = 24
 mpl.rcParams['axes.facecolor'] = 'white'
 #mpl.rcParams['axes.grid'] = True
 
@@ -47,13 +47,14 @@ data = np.concatenate((bmf,fds_nurBund,whout_bmf),axis=0)
 
 #%% plot
 
-df = pd.DataFrame(data.T,columns=['BM Finanzen','FragDenStaat','Gesamt ohne BMF und FDS'],
+df = pd.DataFrame(data.T,columns=['Ministry of Finances','FragDenStaat','Total whithout Finance und FDS'],
                   index = years)
 ax = df.plot(kind='area',figsize=(16,12),alpha=0.9)
+ax.plot([4.8,4.8],[0,3000],'k--',lw=4)
 ax.xaxis.set_tick_params(top='off')
 ax.yaxis.set_tick_params(right='off')
-ax.annotate("Start von FragDenStaat (Oktober 2011)",
-            xy=(4.5,2500), xycoords='data',
+ax.annotate("Start of FragDenStaat (October 2011)",
+            xy=(4.8,2500), xycoords='data',
             size=24,
             ha="center", va="center",
             xytext=(3, 5000), textcoords='data',
@@ -62,9 +63,9 @@ ax.annotate("Start von FragDenStaat (Oktober 2011)",
                             fc="k",ec="k",
                             connectionstyle="arc3,rad=0.2")
             )
-ax.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-')
-plt.xlabel('Jahr')
-plt.ylabel('Anzahl von Anfragen')
+ax.grid(b=True, which='major', color=[0.5,0.5,0.5], linestyle='-', lw=2)
+plt.xlabel('Year')
+plt.ylabel('Number of requests')
 
 ax.legend_.set_bbox_to_anchor([1.01,1.0])
 lgd = ax.get_legend()
@@ -74,12 +75,12 @@ plt.ylim(0,10000)
 #%% save figure
 
 if os.path.isdir(files_path):
-    plt.savefig(files_path+'ifg_gesamtzahlen.png',bbox_extra_artists=[lgd],
-                bbox_inches='tight',dpi=150)
+    plt.savefig(files_path+'ifg_gesamtzahlen_en.png',bbox_extra_artists=[lgd],
+                bbox_inches='tight',dpi=400)
 else:
     os.mkdir(files_path)
-    plt.savefig(files_path+'ifg_gesamtzahlen.png',bbox_extra_artists=[lgd],
-                bbox_inches='tight',dpi=150)
+    plt.savefig(files_path+'ifg_gesamtzahlen_en.png',bbox_extra_artists=[lgd],
+                bbox_inches='tight',dpi=400)
 plt.close()
 
 
